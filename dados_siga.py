@@ -65,18 +65,18 @@ def split_companies(df_empresas):
     socios = []
     for id, row_empresa in df_empresas.iterrows():
         str_empresa = row_empresa['Proprietário / Regime de Exploração']
+        if str_empresa and str(str_empresa) != 'nan':
+            # quebra a string nos percentuais e, depois, nos regimes de contratação
+            participacoes, empresas, regimes = break_percent(str_empresa)
 
-        # quebra a string nos percentuais e, depois, nos regimes de contratação
-        participacoes, empresas, regimes = break_percent(str_empresa)
+            # o CEG da usina é inserido na lista de acordo com o número de empresas retornadas
+            cegs = [row_empresa['CEG']] * len(empresas)
 
-        # o CEG da usina é inserido na lista de acordo com o número de empresas retornadas
-        cegs = [row_empresa['CEG']] * len(empresas)
+            # cria uma lista de tuplas contendo (ceg, empresa, regime, participacao)
+            socio = zip(cegs, empresas, regimes, participacoes)
 
-        # cria uma lista de tuplas contendo (ceg, empresa, regime, participacao)
-        socio = zip(cegs, empresas, regimes, participacoes)
-
-        # insere cada sócio (a tupla acima) na lista de socios
-        for s in list(socio):
-            socios.append(s)
+            # insere cada sócio (a tupla acima) na lista de socios
+            for s in list(socio):
+                socios.append(s)
     df = pd.DataFrame(socios, columns=['ceg', 'empresa', 'regime', 'participacao'])  # gera o dataframe para salvar
     return df

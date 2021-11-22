@@ -37,6 +37,12 @@ def siga_df():
     return df
 
 
+def test_split_all_companies(siga_df):
+    df_empresas = split_companies(siga_df)
+    assert isinstance(df_empresas, pd.DataFrame)
+    assert df_empresas.shape == (5, 4)
+
+
 def test_split_percent_3(siga_df):
     companies_cel = siga_df.loc[2, 'Proprietário / Regime de Exploração']
     participacoes, empresas, regimes = break_percent(companies_cel)
@@ -52,61 +58,13 @@ def test_split_percent_2(siga_df):
     assert empresas == ['Empresa pará', 'Empresa Y']
     assert regimes == ['ABC', 'DEF']
 
+
 def test_split_percent_1(siga_df):
     companies_cel = siga_df.loc[0, 'Proprietário / Regime de Exploração']
     participacoes, empresas, regimes = break_percent(companies_cel)
     assert participacoes == [1.0]
     assert empresas == ['Empresa A']
     assert regimes == ['PIE']
-
-
-def test_3(siga_df):
-    socios = siga_df.loc[2]
-    assert split_companies(socios) == [
-        {
-            'CEG': 'PIE.AA.BB.123456-7',
-            'Empresa': 'Empresa W',
-            'Regime': 'GHI',
-            'Participação': 0.695555
-        },
-        {
-            'CEG': 'PIE.AA.BB.123456-7',
-            'Empresa': 'Empresa Y',
-            'Regime': 'JKL',
-            'Participação': 0.305555
-        }
-    ]
-
-
-def test_2(siga_df):
-    socios = siga_df.loc[1]
-    assert split_companies(socios) == [
-        {
-            'CEG': 'UHE.YY.ZZ.123456-7',
-            'Empresa': 'Empresa pará',
-            'Regime': 'ABC',
-            'Participação': 0.79
-        },
-        {
-            'CEG': 'UHE.YY.ZZ.123456-7',
-            'Empresa': 'Empresa Y',
-            'Regime': 'DEF',
-            'Participação': 0.21
-        }
-
-    ]
-
-
-def test_1(siga_df):
-    socios = siga_df.loc[0]
-    assert split_companies(socios) == [
-        {
-            'CEG': 'UTE.XX.XX.123456-7',
-            'Empresa': 'Empresa A',
-            'Regime': 'PIE',
-            'Participação': 1.0
-        }
-    ]
 
 
 def test_dataframe(siga_df):

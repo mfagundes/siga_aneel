@@ -1,35 +1,5 @@
-import pandas as pd
-import pytest
-
-from dados_siga import split_companies, break_percent, break_regime
-
-"""
-Formato final dos dados para geração do DataFrame. Posteriormente, 
-fazer a separação das empresas em uma tabela separada, assim teremos
-o relacionamento N:N correto
-
-data = [
-    (ceg, empresa, regime, participacao)
-]
-"""
-
-@pytest.fixture
-def siga_df():
-    df = pd.DataFrame([
-        {
-            'CEG': 'UTE.XX.XX.123456-7',
-            'Proprietário / Regime de Exploração': '100% para Empresa A (PIE)'
-        },
-        {
-            'CEG': 'UHE.YY.ZZ.123456-7',
-            'Proprietário / Regime de Exploração': '79% para Empresa pará (ABC) 21% para Empresa Y (DEF)'
-        },
-        {
-            'CEG': 'PIE.AA.BB.123456-7',
-            'Proprietário / Regime de Exploração':'69.5555% para Empresa W (GHI) 30.5555% para Empresa V (JKL)'
-        }
-    ])
-    return df
+from dados_siga import split_companies, break_percent, split_ceg, create_types_df
+from fixtures import *
 
 
 def test_split_all_companies(siga_df):
@@ -84,6 +54,35 @@ def test_split_percent_1(siga_df):
     assert regimes == ['PIE']
 
 
-def test_dataframe(siga_df):
-    """Fixture é um DataFrame"""
+def test_split_ceg(siga_df, ceg_df) -> None:
+    """
+    Recebe o DataFrame do Siga e separa o CEG dos seus componentes
+    :param siga_df: dataframe do Siga
+    :type: pd.DataFrame
+    :param ceg_df: fixture esperada
+    :return: None
+    """
+    df_res = split_ceg(siga_df)
+    assert df_res.equals(ceg_df)
+
+
+def test_create_type_list(siga_df: pd.DataFrame, tipos_df: pd.DataFrame) -> None:
+    """
+    Como o Siga usa o tipo por extenso, criamos uma tabela, baseada no código
+    que compõe o CEG, para fazer uma tabela de relacionamentos entre o código
+    do tipo e seu nome por extenso
+    :param siga_df: dataframe do Siga
+    :type: pd.DataFrame
+    :return: None
+    """
+    res = create_types_df(siga_df)
+    assert res.equals(tipos_df)
+
+
+def test_dataframe(siga_df: pd.DataFrame) -> None:
+    """
+    Testa se a fixture siga_df é um DataFrame do pandas
+    :param siga_df: pd.Dataframe
+    :return:
+    """
     assert isinstance(siga_df, pd.DataFrame)
